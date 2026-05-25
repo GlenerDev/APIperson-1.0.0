@@ -16,10 +16,10 @@ namespace teste.Controllers
         {
             DataBase = new Dbase.DBase();
         }
-        [HttpGet("GetPerson")]
-        public IActionResult Get()
+        [HttpGet("GetPerson/id/{id}")]
+        public IActionResult Get(int id)
         {
-            return Ok("meu teste de Get");
+            return Ok("foi um cusseo");
         }
         [HttpGet("GetVerifyConnection")]
         public IActionResult VerifyConnection()
@@ -31,5 +31,4 @@ namespace teste.Controllers
             return Problem("Falha na conexão");
         }
     }
-
 }

@@ -58,5 +58,20 @@ namespace teste.Dbase
         {
             
         }
+
+        internal List<Person> GetAllUsers()
+        {
+            List<Person> resultlist = new List<Person>();
+            var cmd = "SELECT * FROM Pessoas";
+            var sqlitecomand = new SQLiteCommand(cmd,sqlite);
+            SQLiteDataReader reader = sqlitecomand.ExecuteReader();
+            while (reader.Read()) 
+            {
+                Person p = new Person(Convert.ToInt32(reader["Idade"])); 
+                
+            
+            }
+                
+        }
     }
 }
