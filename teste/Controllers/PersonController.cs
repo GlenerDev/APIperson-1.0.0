@@ -22,7 +22,7 @@ namespace teste.Controllers
             return Ok("meu teste de Get");
         }
         [HttpGet("GetVerifyConnection")]
-        public IActionResult Conectar()
+        public IActionResult VerifyConnection()
         {
             if (DataBase.Connect())
             {

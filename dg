@@ -1,0 +1,11 @@
+[33mcommit 094f754c87947a072368c92efecd5244ce6e5345[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Glener Chrystian <glenersouza2014@gmail.com>
+Date:   Sun May 24 23:20:07 2026 -0300
+
+    Adicionar arquivos de projeto.
+
+[33mcommit 31ca755ab33062d1d86f5168e2c4fc81b0b18cfa[m
+Author: Glener Chrystian <glenersouza2014@gmail.com>
+Date:   Sun May 24 23:20:04 2026 -0300
+
+    Adicione .gitattributes, .gitignore e README.md.

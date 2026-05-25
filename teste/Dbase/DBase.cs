@@ -9,6 +9,7 @@ namespace teste.Dbase
         public SQLiteConnection sqlite = new SQLiteConnection(@"Data Source=C:\Projetos\Bancos\DbPerson.db");
         public DBase()
         {
+
         }
         public  bool Connect()
         {
