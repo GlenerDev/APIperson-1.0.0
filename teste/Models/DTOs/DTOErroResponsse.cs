@@ -1,4 +1,4 @@
-﻿namespace teste.Models.NovaPasta1.VO
+﻿namespace APIperson.Models.DTOs
 {
     public class ErroResponse
     {

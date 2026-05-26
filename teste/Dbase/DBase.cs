@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Data.SQLite;
 using teste.Models;
 
@@ -9,7 +11,7 @@ namespace teste.Dbase
         public SQLiteConnection sqlite = new SQLiteConnection(@"Data Source=C:\Projetos\Bancos\DbPerson.db");
         public DBase()
         {
-
+            Connect();
         }
         public  bool Connect()
         {
@@ -54,24 +56,40 @@ namespace teste.Dbase
 
             }
         }
-        public void CreateTable(string nametable, params object[] listvalues) 
+        public void CreateTableForDataBase(string nametable,string nome,string Idade, string CPF, string Id = "") 
         {
-            
-        }
+           
+            string cmdSQL = 
+                "CREATE TABLE " +
+                "@nametable " +
+                "(" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "@nome TEXT NOT NULL," +
+                "@idade INTEGER NOT NULL," +
+                "@CPF TEXT NOT NULL);";
 
-        internal List<Person> GetAllUsers()
+            var cmdcreatetable = new SQLiteCommand(cmdSQL, sqlite);
+            cmdcreatetable.Parameters.AddWithValue("@Id", Id);
+            cmdcreatetable.Parameters.AddWithValue("@nome", nome);
+            cmdcreatetable.Parameters.AddWithValue("@idade", Idade);
+            cmdcreatetable.Parameters.AddWithValue("@CPF", CPF);
+            cmdcreatetable.ExecuteNonQuery();
+        }
+        public List<Person> GetAllUsers()
         {
             List<Person> resultlist = new List<Person>();
             var cmd = "SELECT * FROM Pessoas";
-            var sqlitecomand = new SQLiteCommand(cmd,sqlite);
-            SQLiteDataReader reader = sqlitecomand.ExecuteReader();
-            while (reader.Read()) 
+            var sqlitecomand = new SQLiteCommand(cmd,sqlite);// criar um objeto SQLiteCommand com o comando e o banco de dados 
+            SQLiteDataReader reader = sqlitecomand.ExecuteReader();// leitor SQLite dos dados presentes no banco de dados
+            while (reader.Read())// Enquanto estiver intens para serem lidos, o item será adicionado dentro da lista de persons 
             {
-                Person p = new Person(Convert.ToInt32(reader["Idade"])); 
-                
-            
+                Person p = new Person(Convert.ToInt32(reader["Idade"]), reader["Name"].ToString()!); // cria um nova instancia do item lido.
+                                                                                                     
+                resultlist.Add(p);//adiciona o objeto dentro da lista
             }
-                
+            Results.Ok("leitura finalizada");//indica que todos os itens do bancos de dados já foram lidos.
+            return resultlist;//retornar a lista de todos os usuarios do banco de de Dados
+
         }
     }
 }

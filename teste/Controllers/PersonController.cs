@@ -1,7 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using APIperson.Models.DTOs;
 using teste.Models;
-using teste.Models.NovaPasta1.VO;
 namespace teste.Controllers
 {
 
@@ -17,9 +16,9 @@ namespace teste.Controllers
             DataBase = new Dbase.DBase();
         }
         [HttpGet("GetPerson/id/{id}")]
-        public IActionResult Get(int id)
+        public ActionResult<List<Person>> Get(int id)
         {
-            return Ok("foi um cusseo");
+            return DataBase.GetAllUsers();
         }
         [HttpGet("GetVerifyConnection")]
         public IActionResult VerifyConnection()
@@ -29,6 +28,16 @@ namespace teste.Controllers
                 return Ok("conectado com Sucesso!");
             }
             return Problem("Falha na conexão");
+        }
+        [HttpGet("GetAllUsers")]
+        public IEnumerable<Person> Get()
+        {
+            return DataBase.GetAllUsers();
+        }
+        [HttpPost("SetPerson")]
+        public ActionResult SetPerson([FromBody] Person person) 
+        {
+            return Ok(person);
         }
     }
 }
