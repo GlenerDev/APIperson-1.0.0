@@ -83,8 +83,8 @@ namespace teste.Dbase
             SQLiteDataReader reader = sqlitecomand.ExecuteReader();// leitor SQLite dos dados presentes no banco de dados
             while (reader.Read())// Enquanto estiver intens para serem lidos, o item será adicionado dentro da lista de persons 
             {
-                Person p = new Person(Convert.ToInt32(reader["Idade"]), reader["Name"].ToString()!); // cria um nova instancia do item lido.
-                                                                                                     
+                Person p = new Person(Convert.ToInt32(reader["Idade"]), reader["Name"].ToString()!,"111.223.455-60"); // cria um nova instancia do item lido.
+                                                                                                          
                 resultlist.Add(p);//adiciona o objeto dentro da lista
             }
             Results.Ok("leitura finalizada");//indica que todos os itens do bancos de dados já foram lidos.
