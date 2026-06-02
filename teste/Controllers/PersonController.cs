@@ -1,43 +1,56 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using APIperson.Models.DTOs;
-using teste.Models;
-namespace teste.Controllers
+using APIperson.Models;
+using Repository;
+using System.Data.SQLite;
+using APIperson.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
+namespace APIperson.Controllers
 {
 
     [ApiController]/* que essa classe é uma apicontroller e sem ela não poderia fazer as validaçoes ou a verificação 
     da requisições */
     [Route("v1/Person")]
-
     public class PersonController : ControllerBase
     {
-        public Dbase.DBase DataBase { get; set; }
-        public PersonController()
+
+        public DBase DB { get; set; }
+        public PersonController(DBase dbabe)
         {
-            DataBase = new Dbase.DBase();
+            DB = dbabe;
         }
-        [HttpGet("GetPerson/id/{id}")]
-        public ActionResult<List<Person>> Get(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetPersonID(int id)
         {
-            return DataBase.GetAllUsers();
+            var ps = DB.GetIDPerson(id);
+            if (ps is null)
+                StatusCode(404);
+            return NotFound("Recurso solicitado não foi localizado");
+            return Ok(ps);
         }
         [HttpGet("GetVerifyConnection")]
         public IActionResult VerifyConnection()
         {
-            if (DataBase.Connect())
+            if (DB.VerifyConnect())
             {
-                return Ok("conectado com Sucesso!");
+                return Ok("O Armazenamento esta disponivel");
             }
-            return Problem("Falha na conexão");
+            return StatusCode(503);
         }
         [HttpGet("GetAllUsers")]
-        public IEnumerable<Person> Get()
+        public IEnumerable<Person> GetAll()
         {
-            return DataBase.GetAllUsers();
+            return DB.GelAllUsers();
         }
         [HttpPost("SetPerson")]
-        public ActionResult SetPerson([FromBody] Person person) 
+        public ActionResult SetPerson([FromBody] DTOPerson person)
         {
-            return Ok(person);
+            if (person is null)
+            {
+                return BadRequest("Erro no servidor ao adicionar a pessoa");
+            }
+            DB.CreatePerson(person.Name, person.Idade, person.CPF);
+            return StatusCode(201);
         }
     }
 }

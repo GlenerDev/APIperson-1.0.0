@@ -1,15 +1,19 @@
-﻿namespace teste.Models
+﻿namespace APIperson.Models
 {
     public class Person
     {
         public int? ID { get; set; }
         public string name { get;  set; } 
         public int idade { get;  set; } 
-        public string cpf { get;  set; } 
-
-        public Person(int idade, string nome, string CPF)
+        public string cpf { get;  set; }
+        public Person()
         {
-            this.name = name;
+            
+        }
+        public Person(int id,int idade, string nome, string CPF)
+        {
+            ID = id;
+            name = nome;
             this.idade = idade;
             cpf = CPF;
         }
