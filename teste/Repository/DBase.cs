@@ -11,13 +11,14 @@ using System.Text;
 
 namespace Repository
 {
-    public class DBase : ICreateRepository, IGetRepository, IVerifyRepository
+    public class DBase : ICreateRepository, IGetRepository, IVerifyRepository, IDBase
     {
-        private readonly SQLiteConnection _Connection = new SQLiteConnection(@"Data Source=C:\Projetos\Bancos\DbPerson.db");
+        private readonly SQLiteConnection _Connection;
         public DBase(SQLiteConnection connectionsql)
         {
-
+            _Connection = connectionsql;
         }
+        
         public void Connect()
         {
             try
@@ -42,8 +43,8 @@ namespace Repository
                 new Exception(ex.Message);
             }
         }
-        // / / / / / / / / / // / / / / / / / / 
-        public bool VerifyConnect()
+        // / / / / / / function s verifiers // / / / / / / / / 
+        public bool VerifyOpenConnect()
         {
             try
             {
@@ -54,7 +55,7 @@ namespace Repository
                 throw new Exception("Não foi possivel verificar a conexão");
             }
         }
-        public bool VerifyDisconnect()
+        public bool VerifyCloseConnect()
         {
             try
             {
@@ -65,8 +66,7 @@ namespace Repository
                 throw new Exception("Não foi possivel verificar a conexão");
             }
         }
-
-        // / / / / / / / / / // / / / / / / / / 
+        // / / / / / /function create / / / / / / / / 
         public void CreatePerson(string name, int age, string CPF)
         {
             using (_Connection)
@@ -97,8 +97,7 @@ namespace Repository
                 cmdcreatetable.ExecuteNonQuery();
             }
         }
-        // / / / / / / / / / // / / / / / / / / 
-
+        // / / / / / function getters/ / / / / / / / 
         public List<Person> GelAllUsers()
         {
             List<Person> resultlist = new List<Person>();
@@ -137,6 +136,17 @@ namespace Repository
                     p.cpf = reader["CPF"].ToString()!;
                 }
                 return p;
+            }
+        }
+        /////////////function delete///////////////
+        public void DeleteForId(int id)
+        {
+            string strcommand = $"DELETE FROM Pessoas WHERE ID = '{id}'; ";
+            using (_Connection) 
+            {
+                _Connection.Open();
+                var cmd = new SQLiteCommand(strcommand, _Connection);
+                cmd.ExecuteNonQuery();
             }
         }
     }

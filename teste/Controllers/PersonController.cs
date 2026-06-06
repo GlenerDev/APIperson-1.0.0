@@ -13,35 +13,30 @@ namespace APIperson.Controllers
     [Route("v1/Person")]
     public class PersonController : ControllerBase
     {
-
-        public DBase DB { get; set; }
-        public PersonController(DBase dbabe)
+       public DBase DB { get; set; }
+        public PersonController(DBase dbase)
         {
-            DB = dbabe;
+            DB = dbase;
         }
         [HttpGet("{id}")]
         public IActionResult GetPersonID(int id)
         {
             var ps = DB.GetIDPerson(id);
             if (ps is null)
-                StatusCode(404);
-            return NotFound("Recurso solicitado não foi localizado");
-            return Ok(ps);
+                return NotFound("Recurso solicitado não encontrado");
+            return Ok();
         }
         [HttpGet("GetVerifyConnection")]
         public IActionResult VerifyConnection()
         {
-            if (DB.VerifyConnect())
+            if (DB.VerifyOpenConnect())
             {
                 return Ok("O Armazenamento esta disponivel");
             }
-            return StatusCode(503);
+            return StatusCode(503, "Conexão não disponivel");
         }
         [HttpGet("GetAllUsers")]
-        public IEnumerable<Person> GetAll()
-        {
-            return DB.GelAllUsers();
-        }
+        public IEnumerable<Person> GetAll() => DB.GelAllUsers();
         [HttpPost("SetPerson")]
         public ActionResult SetPerson([FromBody] DTOPerson person)
         {
@@ -50,7 +45,14 @@ namespace APIperson.Controllers
                 return BadRequest("Erro no servidor ao adicionar a pessoa");
             }
             DB.CreatePerson(person.Name, person.Idade, person.CPF);
-            return StatusCode(201);
+            return StatusCode(201, "usuario adicionado com sucesso");
+        }
+
+        [HttpDelete("DeleteForId")]
+        public IActionResult DeleteForID(int id)
+        {
+            DB.DeleteForId(id);
+            return Ok("recurso deletado com sucesso");
         }
     }
 }

@@ -8,17 +8,15 @@ using System.Data.SQLite;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+string connection = "Data Source=C:\\Projetos\\Bancos\\DbPerson.db";
+builder.Services.AddScoped(provider => new SQLiteConnection(connection));
 builder.Services.AddScoped<DBase>();
-builder.Services.AddScoped<SQLiteConnection>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

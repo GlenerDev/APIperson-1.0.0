@@ -6,10 +6,7 @@
         public string name { get;  set; } 
         public int idade { get;  set; } 
         public string cpf { get;  set; }
-        public Person()
-        {
-            
-        }
+        public Person() { }
         public Person(int id,int idade, string nome, string CPF)
         {
             ID = id;
