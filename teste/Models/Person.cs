@@ -2,17 +2,17 @@
 {
     public class Person
     {
-        public int? ID { get; set; }
-        public string name { get;  set; } 
-        public int idade { get;  set; } 
-        public string cpf { get;  set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string CPF { get; set; }
         public Person() { }
-        public Person(int id,int idade, string nome, string CPF)
+        public Person(int id, string name, int age, string cpf)
         {
-            ID = id;
-            name = nome;
-            this.idade = idade;
-            cpf = CPF;
+            Id = id;
+            Name = name;
+            Age = age;
+            CPF = cpf;
         }
     }
 }
