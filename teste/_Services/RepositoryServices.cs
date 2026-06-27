@@ -1,32 +1,41 @@
 ﻿using APIperson._Services.PersonValidations;
 using APIperson.Interfaces;
 using Repository;
+using System.Data;
 using System.Data.SQLite;
 
 namespace APIperson._Services
 {
-    public class RepositoryServices : DBase , IDBaseRepository
+    public class RepositoryServices : DBase, IDBaseRepository
     {
         public readonly DBase DB;
-        private ValidationPerson _validations;
-        public RepositoryServices(DBase dBase,ValidationPerson validation)
+        public RepositoryServices(DBase dBase)
         {
             DB = dBase;
-            _validations = validation;
-            
         }
-        public bool VerifyOpenConnect() 
+        public bool VerifyOpenConnect()
         {
-            if(_Connection.State ==  )
+            if (_Connection.State == ConnectionState.Open)
+            {
+                return true;
+            }
+            return false;
         }
-        
-        public void OpenConnect() 
+        public void OpenConnect()
         {
-            
+            if (_Connection.State == ConnectionState.Closed)
+            {
+                DB.OpenConnect();
+            }
+            throw new Exception("O Banco já esta aberto");
         }
-        public void Disconnect() 
+        public void Disconnect()
         {
-        
+            if (_Connection.State == ConnectionState.Open)
+            {
+                DB.OpenConnect();
+            }
+            throw new Exception("O Banco já esta Fechado");
         }
     }
 }
