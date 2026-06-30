@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Documentação - API Pessoa</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="nav"><div class="brand">API Pessoal</div><div><a href="index.html">Início</a></div></nav>
+  <main class="container">
+    <div class="card">
+      <h2 class="header-title">Documentação da API</h2>
+      <p>Exemplos rápidos de endpoints essenciais.</p>
+      <h3>GET /v1/Person/{id}</h3>
+      <pre>{ "ID": 1, "name": "Fulano", "idade": 30, "cpf": "000.000.000-00" }</pre>
+      <h3>GET /v1/Person/GetAllUsers</h3>
+      <p>Retorna lista de usuários.</p>
+      <h3>POST /v1/Person/SetPerson</h3>
+      <pre>{ "name": "Fulano", "idade": 30, "cpf": "000.000.000-00" }</pre>
+      <h3>Autenticação</h3>
+      <p>POST /v1/auth/login {email,password} — retorna token JWT.</p>
+    </div>
+  </main>
+</body>
+</html>

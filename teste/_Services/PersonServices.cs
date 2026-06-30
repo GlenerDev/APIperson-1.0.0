@@ -5,56 +5,69 @@ using APIperson.Models.DTOs;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Repository;
+using APIperson.Services;
 using System.Data.SQLite;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace APIperson.Services
 {
-    public class PersonServices : ValidationPerson , IPersonRepository
+    public class PersonServices : IPersonRepositoryService
     {
         private readonly DBase DB;
-
-        public PersonServices(DBase dBase,ValidationPerson valitadionperson)
+        private readonly ValidationPerson Valid;
+        public PersonServices(DBase dbase, ValidationPerson validationperson)
         {
-            DB = dBase;
-            _validation = valitadionperson;
+            DB = dbase;
+            Valid = validationperson;
         }
-        
-        public void CreatePerson(string name, int age, string CPF)
+        public void ServiceCreatePerson(Person person)
         {
-            if ( _validation.ValidationCreatePerson(name, age, CPF))
+            if (Valid.ValidationCreatePerson(person))
             {
-                 DB.CreatePerson(name,age,CPF);
+                DB.CreatePerson(person);
                 return;
             }
             throw new ArgumentException("erro na declaraçao do solicitado.");
         }
-        public Person GetIDPerson(int id)
+        public Person ServiceGetIDPerson(int id)
         {
-            var person = DB.GetIDPerson(id);
-            if (person == null)
+            if (Valid.IdValidation(id))
             {
-                throw new KeyNotFoundException("Possoa não existe no banco de dados");
+                if (DB.PersonExist(DB.GetIDPerson(id).Id))
+                {
+                    return DB.GetIDPerson(id);
+                }
             }
-            return person;
+            throw new ArgumentException("Possoa não existe no banco de dados");
         }
-        public List<DTOPerson> GetAllUsers() 
+        public List<DTOPerson> ServiceGetAllUsers()
         {
-            if (DB.GelAllUsers().Count == 0) 
+            if (DB.GetAllUsers().Count != 0)
             {
-                throw new InvalidOperationException("nenhuma pessoa encontrada");
+                return DB.GetAllUsers();
             }
-            return DB.GelAllUsers();
+            throw new InvalidOperationException("nenhuma pessoa encontrada");
         }
-        public void DeleteForId(int id) 
+        public void ServiceDeleteForId(int id)
         {
-        
-        
+            if (DB.PersonExist(id) && Valid.IdValidation(id))
+            {
+                DB.DeleteForId(id);
+                return;
+            }
+            throw new ArgumentException("não tem como deletar uma pessoa que não existe no banco");
         }
-        public void UpdatePersonId(int id, string name, int age, string cpf)
+        public void ServiceUpdatePersonId(int id, string nome, int idade)
         {
-            DB.
+            if (DB.PersonExist(id) && Valid.IdValidation(id))
+            {
+                DB.UpdatePersonId(id, nome, idade);
+                return;
+            }
+            throw new ArgumentException("Nao tem como atualizar uma pessoa que não existe no banco");
         }
     }
 }
+
+

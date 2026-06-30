@@ -4,11 +4,15 @@ namespace APIperson.Models.DTOs
 {
     public class DTOPerson
     {
-        public string Name { get; set; }
-        public int Idade { get; set; }
-        public string CPF { get; set; }
-        public DTOPerson()
+        public int? ID { get;  }
+        public string Name { get;  }
+        public int Idade { get; }
+        public DTOPerson(int id, string name, int idade)
         {
+            ID = id;
+            Name = name;
+            Idade = idade;
         }
+        
     }
 }

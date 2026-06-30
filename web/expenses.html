@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gastos & Pagamentos - API Pessoa</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <nav class="nav"><div class="brand">API Pessoal</div><div><a href="index.html">Início</a></div></nav>
+  <main class="container">
+    <div class="grid">
+      <div class="card">
+        <h3 class="header-title">Gastos Mensais</h3>
+        <canvas id="expensesChart" height="120"></canvas>
+      </div>
+      <div class="card">
+        <h3 class="header-title">Pagamentos Recentes</h3>
+        <table class="table"><thead><tr><th>Data</th><th>Funcionário</th><th>Valor</th></tr></thead><tbody>
+          <tr><td>2026-06-01</td><td>Mariana</td><td>R$ 4.500,00</td></tr>
+          <tr><td>2026-05-28</td><td>Rafael</td><td>R$ 3.200,00</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+    <div style="margin-top:18px" class="card">
+      <h3 class="header-title">Filtrar por período</h3>
+      <div style="display:flex;gap:8px"><input type="month"><button class="btn">Aplicar</button></div>
+    </div>
+  </main>
+  <script>
+    // Demo de dados para o gráfico
+    const ctx = document.getElementById('expensesChart');
+    if(ctx){
+      new Chart(ctx.getContext('2d'),{
+        type:'line',
+        data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun'],datasets:[{label:'Gastos (R$)',data:[45000,38000,42000,47000,46000,48000],borderColor:'#FF8C00',backgroundColor:'rgba(255,140,0,0.12)'}]},
+        options:{scales:{y:{beginAtZero:false}}}
+      });
+    }
+  </script>
+</body>
+</html>
