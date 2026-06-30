@@ -6,149 +6,142 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Text;
 
 
 namespace Repository
 {
-    public class DBase : ICreateRepository, IGetRepository, IVerifyRepository, IDBase
+    public class DBase : IDBaseRepository
     {
-        private readonly SQLiteConnection _Connection;
-        public DBase(SQLiteConnection connectionsql)
-        {
-            _Connection = connectionsql;
-        }
-        
-        public void Connect()
+        public readonly string _ConnectionString;
+        public DBase(string connectionstring) => _ConnectionString = connectionstring;
+        public DBase() { }
+        public void OpenConnect(SQLiteConnection conn)
         {
             try
             {
-                if (_Connection.State != ConnectionState.Open)
-                    _Connection.Open();
+                conn.Open();
             }
             catch (SQLiteException ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-        public void Disconnect()
+        public void Disconnect(SQLiteConnection conn)
         {
             try
             {
-                if (_Connection.State != ConnectionState.Open)
-                    _Connection.Close();
+                conn.Close();
             }
             catch (SQLiteException ex)
             {
-                new Exception(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
-        // / / / / / / function s verifiers // / / / / / / / / 
-        public bool VerifyOpenConnect()
-        {
-            try
-            {
-                return _Connection.State == ConnectionState.Open;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Não foi possivel verificar a conexão");
-            }
-        }
-        public bool VerifyCloseConnect()
-        {
-            try
-            {
-                return _Connection.State == ConnectionState.Open;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Não foi possivel verificar a conexão");
-            }
-        }
-        // / / / / / /function create / / / / / / / / 
-        public void CreatePerson(string name, int age, string CPF)
-        {
-            using (_Connection)
-            {
-                _Connection.Open();
-                string sqlcmd = "INSERT INTO Pessoas (Nome, Idade, CPF) VALUES (@Name, @Idade, @CPF)";//comando para inserir valores dentro das informaçoes de uma tabela
-                var cmd = new SQLiteCommand(sqlcmd, _Connection);
-                cmd.Parameters.AddWithValue("@Name", name);
-                cmd.Parameters.AddWithValue("@Idade", age);
-                cmd.Parameters.AddWithValue("@CPF", CPF);
-                cmd.ExecuteNonQuery();
-            }
-        }
-        public void CreateTable(string nametable, params string[] colums)
-        {
-            using (_Connection)
-            {
-                _Connection.Open();
-                var strbuild = new StringBuilder($"CREATE TABLE IF NOT EXISTS '{nametable}' (ID INTEGER PRIMARY KEY AUTOINCREMENT,");
-                for (int i = 0; i < colums.Length; i++)
-                {
-                    strbuild.Append($"'{colums[i]}'");
-                    if (i < colums.Length - 1) strbuild.Append(", ");
-                }
-                strbuild.Append(");");
-                string cmdSQL = strbuild.ToString();
-                var cmdcreatetable = new SQLiteCommand(cmdSQL, _Connection);
-                cmdcreatetable.ExecuteNonQuery();
-            }
-        }
-        // / / / / / function getters/ / / / / / / / 
-        public List<Person> GelAllUsers()
-        {
-            List<Person> resultlist = new List<Person>();
-            var cmd = "SELECT * FROM Pessoas";
-            using (_Connection)
-            {
-                _Connection.Open();
 
-                var sqlitecomand = new SQLiteCommand(cmd, _Connection);
+        #region functions person
+        public bool PersonExist(int id = 0)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
+            {
+                OpenConnect(conn);
+                string comand = $"SELECT 1 WHERE EXISTS (SELECT 1 FROM Pessoas WHERE ID = @id);";
+                SQLiteCommand sqlcomand = new SQLiteCommand(comand, conn);
+                sqlcomand.Parameters.AddWithValue("@id", id);
+                SQLiteDataReader reader = sqlcomand.ExecuteReader();
+                bool resultboolean = reader.Read();
+                return resultboolean;
+            }
+        }
+        public List<DTOPerson> GetAllUsers()
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
+            {
+                OpenConnect(conn);
+                List<DTOPerson> resultlist = new List<DTOPerson>();
+                var cmd = "SELECT * FROM Pessoas";
+                var sqlitecomand = new SQLiteCommand(cmd, conn);
                 SQLiteDataReader reader = sqlitecomand.ExecuteReader();// leitor SQLite dos dados presentes no banco de dados
-                while (reader.Read())// Enquanto estiver intens para serem lidos, o item será adicionado dentro da lista de persons 
+                while (reader.Read())// Enquanto tiver intens para serem lidos, o item será adicionado dentro da lista de persons 
                 {
-                    Person p = new Person(Convert.ToInt32(reader["ID"]),
-                        Convert.ToInt32(reader["Idade"]),
-                        reader["Nome"].ToString()!, reader["CPF"].ToString()); // cria um nova instancia do item lido.
-                    resultlist.Add(p);//adiciona o objeto dentro da lista
+                    // cria um nova instancia do item lido.
+                    Person p = new Person(
+                        Convert.ToInt32(
+                        reader["ID"]),
+                        reader["Nome"].ToString()!,
+                        Convert.ToInt32(
+                        reader["Idade"]),
+                        reader["CPF"].ToString()!);
+
+                    resultlist.Add(new DTOPerson(p.Id, p.Name, p.Age));//adiciona uma pessoa dentro da lista
                 }
                 return resultlist;//retornar a lista de todos os usuarios do banco de de Dados
             }
         }
+        public void CreatePerson(Person person)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
+            {
+                OpenConnect(conn);
+                string sqlcmd = "INSERT INTO Pessoas (Nome, Idade, CPF) VALUES (@Name, @Idade, @CPF)";//comando para inserir valores dentro das informaçoes de uma tabela
+                var cmd = new SQLiteCommand(sqlcmd, conn);
+                cmd.Parameters.AddWithValue("@Name", person.Name);
+                cmd.Parameters.AddWithValue("@Idade", person.Age);
+                cmd.Parameters.AddWithValue("@CPF", person.CPF);
+                cmd.ExecuteNonQuery();
+            }
+        }
         public Person GetIDPerson(int id)
         {
-            string cmdString = $"SELECT * FROM Pessoas WHERE ID = '{id}';";
 
-            using (_Connection)
+            Person result = new Person();
+            string cmdString = $"SELECT * FROM Pessoas WHERE ID = @id;";
+            using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
             {
-                _Connection.Open();
-                SQLiteCommand sqliteComand = new SQLiteCommand(cmdString, _Connection);
+                OpenConnect(conn);
+                SQLiteCommand sqliteComand = new SQLiteCommand(cmdString, conn);
+                sqliteComand.Parameters.AddWithValue("@id", id);
                 var reader = sqliteComand.ExecuteReader();
                 var p = new Person();
                 if (reader.Read())
                 {
-                    p.ID = Convert.ToInt32(reader["ID"]);
-                    p.name = reader["Nome"].ToString()!;
-                    p.idade = Convert.ToInt32(reader["Idade"]);
-                    p.cpf = reader["CPF"].ToString()!;
+                    p.Id = Convert.ToInt32(reader["ID"]);
+                    p.Name = reader["Nome"].ToString()!;
+                    p.Age = Convert.ToInt32(reader["Idade"]);
+                    p.CPF = reader["CPF"].ToString()!;
                 }
-                return p;
+                result = p;
+            }
+            return result;
+        }
+        public void UpdatePersonId(int id, string name, int age)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
+            {
+                OpenConnect(conn);
+                string stringcommand = $"UPDATE Pessoas SET Nome = @name, Idade = @age, WHERE ID = @id;";
+                SQLiteCommand cmdsql = new SQLiteCommand(stringcommand, conn);
+
+                cmdsql.Parameters.AddWithValue("@name", name);
+                cmdsql.Parameters.AddWithValue("@age", age);
+                cmdsql.Parameters.AddWithValue("@id", id);
+                cmdsql.ExecuteNonQuery();
             }
         }
-        /////////////function delete///////////////
         public void DeleteForId(int id)
         {
-            string strcommand = $"DELETE FROM Pessoas WHERE ID = '{id}'; ";
-            using (_Connection) 
+            using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
             {
-                _Connection.Open();
-                var cmd = new SQLiteCommand(strcommand, _Connection);
+                OpenConnect(conn);
+                string strcommand = $"DELETE FROM Pessoas WHERE ID = @id; ";
+                var cmd = new SQLiteCommand(strcommand, conn);
+                cmd.Parameters.AddWithValue("@id", id);
                 cmd.ExecuteNonQuery();
             }
         }
+
+        #endregion
     }
 }
 
