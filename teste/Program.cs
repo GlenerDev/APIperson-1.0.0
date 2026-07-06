@@ -11,7 +11,7 @@ using APIperson._Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-string connectionstr = @"Data Source=C:\Projetos\Bancos\DbPerson.db";
+string connectionstr = @"Data Source=C:\Users\glene\OneDrive\Área de Trabalho\Projetos\teste\teste\ArquivoDb\DbPerson.db";
 builder.Services.AddScoped<DBase>(connection => new DBase(connectionstr));
 builder.Services.AddScoped<ValidationPerson>();
 builder.Services.AddScoped<PersonServices>();
