@@ -16,15 +16,17 @@ namespace APIperson._Services.PersonValidations
         
         public bool ValidationCreatePerson(Person person)
         {
-            if (!Db.PersonExist(person.Id) ||
-                person == null ||
-                string.IsNullOrEmpty(person.Name) ||
-                person.Age < 0 ||
-                string.IsNullOrEmpty(person.CPF))
+            bool result = false;
+            if (Db.PersonExist(person.Id)) 
             {
-                return false;
+                throw new ArgumentException("essa pessoa ja existe, coloque campos diferentes ou atualize na função a-baixo.");
             }
-            return true;
+            if (person == null || string.IsNullOrEmpty(person.Name) || person.Age < 0 || string.IsNullOrEmpty(person.CPF))
+            {
+                result = false;
+            }
+            else { result = true; }
+            return result;
         }
         public bool ValidationCPF(string cpf)
         {
