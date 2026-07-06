@@ -9,6 +9,7 @@ using APIperson.Services;
 using System.Data.SQLite;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace APIperson.Services
 {
@@ -49,23 +50,30 @@ namespace APIperson.Services
             }
             throw new InvalidOperationException("nenhuma pessoa encontrada");
         }
-        public void ServiceDeleteForId(int id)
+        public async Task ServiceDeleteForId(int id)
         {
-            if (DB.PersonExist(id) && Valid.IdValidation(id))
+            if (!DB.PersonExist(id))
+            {
+                throw new ArgumentException("Nao tem como deletar alguem que não existe no banco.");
+            }
+            if (Valid.IdValidation(id))
             {
                 DB.DeleteForId(id);
                 return;
             }
-            throw new ArgumentException("não tem como deletar uma pessoa que não existe no banco");
         }
-        public void ServiceUpdatePersonId(int id, string nome, int idade)
+        public async Task ServiceUpdatePersonId(int id, string nome, int idade, string cpf)
         {
-            if (DB.PersonExist(id) && Valid.IdValidation(id))
+            if (!DB.PersonExist(id))
             {
-                DB.UpdatePersonId(id, nome, idade);
+                throw new ArgumentException("Nao tem como atualizar uma pessoa que não existe no banco");
+            }
+            if (Valid.IdValidation(id))
+            {
+                DB.UpdatePersonId(id, nome, idade, cpf);
                 return;
             }
-            throw new ArgumentException("Nao tem como atualizar uma pessoa que não existe no banco");
+
         }
     }
 }

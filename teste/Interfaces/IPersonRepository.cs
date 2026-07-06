@@ -8,7 +8,7 @@ namespace APIperson.Interfaces
         public void ServiceCreatePerson(Person person);
         public Person ServiceGetIDPerson(int id);
         public List<DTOPerson> ServiceGetAllUsers();
-        public void ServiceDeleteForId(int id);
-        public void ServiceUpdatePersonId(int id, string nome,int idade);
+        public Task ServiceDeleteForId(int id);
+        public Task ServiceUpdatePersonId(int id, string nome,int idade,string cpf);
     }
 }

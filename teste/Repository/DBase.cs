@@ -115,14 +115,14 @@ namespace Repository
             }
             return result;
         }
-        public void UpdatePersonId(int id, string name, int age)
+        public void UpdatePersonId(int id, string name, int age,string cpf)
         {
             using (SQLiteConnection conn = new SQLiteConnection(_ConnectionString))
             {
                 OpenConnect(conn);
-                string stringcommand = $"UPDATE Pessoas SET Nome = @name, Idade = @age, WHERE ID = @id;";
+                string stringcommand = $"UPDATE Pessoas SET Nome = @name, Idade = @age,CPF = @cpf, WHERE ID = @id;";
                 SQLiteCommand cmdsql = new SQLiteCommand(stringcommand, conn);
-
+                cmdsql.Parameters.AddWithValue("@cpf", cpf);
                 cmdsql.Parameters.AddWithValue("@name", name);
                 cmdsql.Parameters.AddWithValue("@age", age);
                 cmdsql.Parameters.AddWithValue("@id", id);
@@ -140,7 +140,6 @@ namespace Repository
                 cmd.ExecuteNonQuery();
             }
         }
-
         #endregion
     }
 }
