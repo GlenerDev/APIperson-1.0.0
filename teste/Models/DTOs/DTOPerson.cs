@@ -7,6 +7,10 @@ namespace APIperson.Models.DTOs
         public int? ID { get;  }
         public string Name { get;  }
         public int Idade { get; }
+        public DTOPerson()
+        {
+            
+        }
         public DTOPerson(int id, string name, int idade)
         {
             ID = id;

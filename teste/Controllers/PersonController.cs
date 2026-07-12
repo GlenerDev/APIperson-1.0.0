@@ -27,14 +27,17 @@ namespace APIperson.Controllers
             _repositoryServices = repositoryservice;
         }
 
-        [HttpGet]
+        [HttpGet("Get/id")]
         public async Task<IActionResult> GetPersonID([Required] int id)
         {
-            Person pessoa = _personServices.ServiceGetIDPerson(id);
-            if (pessoa.Id == 0) return NotFound("Recurso solicitado não encontrado");
-            return Ok(new DTOPerson(pessoa.Id, pessoa.Name, pessoa.Age));
+            try
+            {
+                Person pessoa = await _personServices.ServiceGetIDPerson(id);
+                return Ok(new DTOPerson(pessoa.ID, pessoa.Nome, pessoa.Idade));
+            }
+            catch (Exception ex) { return NotFound(ex.Message); }
         }
-        [HttpGet("GetVerifyConnection")]
+        [HttpGet("Get/VerifyConnection")]
         public async Task<ActionResult> VerifyConnection()
         {
             try
@@ -47,16 +50,14 @@ namespace APIperson.Controllers
             }
             catch (Exception ex) { return StatusCode(503, ex.Message); }
         }
-        [HttpGet("GetAllUsers")]
-        public async Task <ActionResult> GetAllPersons()
+        [HttpGet("Get/AllUsers")]
+        public async Task<ActionResult> GetAllPersons()
         {
+            List<DTOPerson> listresulthtpp = new List<DTOPerson>();
             try
             {
-                if (_personServices.ServiceGetAllUsers() == null) 
-                { 
-                    StatusCode(404, "Nenhum registro presente no momento"); 
-                }
-                return Ok(_personServices.ServiceGetAllUsers());
+                _personServices.ServiceGetAllUsers().Result.ForEach(x => listresulthtpp.Add(new DTOPerson(x.ID, x.Nome, x.Idade)));
+                return Ok(listresulthtpp);
             }
             catch (ArgumentException ex) { return BadRequest(ex.Message); }
         }
@@ -66,8 +67,8 @@ namespace APIperson.Controllers
         {
             try
             {
-                _personServices.ServiceCreatePerson(new Person { Name = person.Nome, Age = person.Idade, CPF = person.CPF });
-                return StatusCode(201, person);
+                await _personServices.ServiceCreatePerson(new Person { Nome = person.Nome, Idade = person.Idade, CPF = person.CPF });
+                return Ok("Recurso criado com sucesso.");
             }
             catch (ArgumentException ex) { return BadRequest(ex.Message); }
         }
@@ -79,18 +80,18 @@ namespace APIperson.Controllers
                 await _personServices.ServiceDeleteForId(id);
                 return Ok("recurso deletado com sucesso");
             }
-            catch (Exception ex) { return StatusCode(500, ex.Message); }
+            catch (Exception ex) { return NotFound(ex.Message); }
         }
         [HttpPut("UpdatePersonId")]
-        public async Task<ActionResult> UpdatePersonId([Required] int id,[FromBody][Required] DTOCreatePerson p)
+        public async Task<ActionResult> UpdatePersonId([Required] int id, [FromBody][Required] DTOCreatePerson p)
         {
             try
             {
-                _personServices.ServiceUpdatePersonId(id, p.Nome, p.Idade,p.CPF);
-                Ok(p);
+                await _personServices.ServiceUpdatePersonId(id, p.Nome, p.Idade, p.CPF);
                 return Ok("Pessoa com campo atualizados");
             }
-            catch (Exception ex) { return StatusCode(500, ex.Message); }
+            catch (Exception ex) { return NotFound(ex.Message); }
         }
     }
-}
+} 
+

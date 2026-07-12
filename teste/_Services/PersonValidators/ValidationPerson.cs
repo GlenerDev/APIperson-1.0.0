@@ -17,11 +17,11 @@ namespace APIperson._Services.PersonValidations
         public bool ValidationCreatePerson(Person person)
         {
             bool result = false;
-            if (Db.PersonExist(person.Id)) 
+            if (Db.PersonExist(person.ID) == true) 
             {
                 throw new ArgumentException("essa pessoa ja existe, coloque campos diferentes ou atualize na função a-baixo.");
             }
-            if (person == null || string.IsNullOrEmpty(person.Name) || person.Age < 0 || string.IsNullOrEmpty(person.CPF))
+            if (person == null || string.IsNullOrEmpty(person.Nome) || person.Idade < 0 || string.IsNullOrEmpty(person.CPF))
             {
                 result = false;
             }

@@ -10,6 +10,7 @@ using System.Data.SQLite;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
+using System.Diagnostics.CodeAnalysis;
 
 namespace APIperson.Services
 {
@@ -22,33 +23,35 @@ namespace APIperson.Services
             DB = dbase;
             Valid = validationperson;
         }
-        public void ServiceCreatePerson(Person person)
+        public async Task ServiceCreatePerson(Person person)
         {
             if (Valid.ValidationCreatePerson(person))
             {
                 DB.CreatePerson(person);
                 return;
             }
-            throw new ArgumentException("erro na declaraçao do solicitado.");
+            throw new ArgumentException("erro no corpo da requisição, por favor coloque as credencias corretas.");
         }
-        public Person ServiceGetIDPerson(int id)
+        public async Task<Person> ServiceGetIDPerson(int id)
         {
-            if (Valid.IdValidation(id))
+            
+            if (Valid.IdValidation(id)) 
             {
-                if (DB.PersonExist(DB.GetIDPerson(id).Id))
+                if (!DB.PersonExist(id))
                 {
-                    return DB.GetIDPerson(id);
+                    throw new NullReferenceException("Possoa não existe no banco de dados");
                 }
+                return DB.GetIDPerson(id);
             }
-            throw new ArgumentException("Possoa não existe no banco de dados");
+            throw new Exception($"{id} -error- number negative ");
         }
-        public List<DTOPerson> ServiceGetAllUsers()
+        public async Task<List<Person>> ServiceGetAllUsers()
         {
             if (DB.GetAllUsers().Count != 0)
             {
                 return DB.GetAllUsers();
             }
-            throw new InvalidOperationException("nenhuma pessoa encontrada");
+            throw new ArgumentException("nenhuma pessoa encontrada");
         }
         public async Task ServiceDeleteForId(int id)
         {
