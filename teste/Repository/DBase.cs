@@ -13,10 +13,9 @@ using Dapper;
 
 namespace Repository
 {
-    public class DBase : IDBaseRepository
+    public class DBase(string connectionstring ) : IDBaseRepository
     {
-        public readonly string _ConnectionString;
-        public DBase(string connectionstring) => _ConnectionString = connectionstring;
+        private readonly string _ConnectionString = connectionstring;
         public void OpenConnect(SQLiteConnection conn)
         {
             try
