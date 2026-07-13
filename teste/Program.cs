@@ -9,12 +9,13 @@ using APIperson.Services;
 using APIperson._Services;
 using Dapper;
 using APIperson.Middleware;
+using APIperson.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-string connectionstr = @"Data Source=C:\Projetos\Bancos\DbPerson.db";
-builder.Services.AddScoped<DBase>(connection => new DBase(connectionstr));
+
+builder.Services.AddScoped<IDBaseRepository>(servicer_provider => builder.Configuration.GetConnectionString("DefaultConnection"));
 builder.Services.AddScoped<ValidationPerson>();
 builder.Services.AddScoped<PersonServices>();
 builder.Services.AddScoped<RepositoryServices>();
