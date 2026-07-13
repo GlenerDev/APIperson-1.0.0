@@ -14,15 +14,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace APIperson.Services
 {
-    public class PersonServices : IPersonRepositoryService
+    public class PersonServices(IDBaseRepository dbase, ValidationPerson validationperson) : IPersonRepositoryService
     {
-        private readonly DBase DB;
-        private readonly ValidationPerson Valid;
-        public PersonServices(DBase dbase, ValidationPerson validationperson)
-        {
-            DB = dbase;
-            Valid = validationperson;
-        }
+        private readonly IDBaseRepository DB = dbase;
+        private readonly ValidationPerson Valid = validationperson;
+      
         public async Task ServiceCreatePerson(Person person)
         {
             if (Valid.ValidationCreatePerson(person))
